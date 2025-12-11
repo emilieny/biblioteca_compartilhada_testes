@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca Compartilhada</title>
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <style>
+        /* Adicione ou ajuste estilos conforme necessário */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+        }
+        header h1 {
+            margin: 0;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .user-info span {
+            font-size: 1.1em;
+        }
+        .user-info button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        .user-info button:hover {
+            background-color: #c82333;
+        }
+        .dashboard-section {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .message {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            display: none;
+            font-weight: bold;
+        }
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        /* Estilos adicionais para as notificações */
+        .notificacao-item {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .notificacao-item.lida {
+            opacity: 0.7;
+            background-color: #e9e9e9;
+        }
+        .notificacao-item p {
+            margin: 0 0 5px 0;
+        }
+        .notificacao-item small {
+            color: #666;
+            font-size: 0.8em;
+        }
+        .notificacao-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-title">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/book.png" alt="Logo Biblioteca" class="logo-img">
+            <h1>Biblioteca Compartilhada</h1>
+        </div>
+        <div class="user-info">
+            <span>Olá, <strong id="loggedInUserName"></strong>!</span>
+            <span>Moedas: <strong id="userBalance">0</strong></span>
+            <button id="logoutButton">Sair</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar-menu">
+            <button class="menu-btn" data-section="perfilSection">👤 Perfil</button>
+            <button class="menu-btn active" data-section="livrosSection">📚 Livros</button>
+            <button class="menu-btn" data-section="doarSection">📖 Doar Livro</button>
+            <button class="menu-btn" data-section="emprestimosSection">🔄 Empréstimo</button>
+            <button class="menu-btn" data-section="devolucaoSection">↩️ Devolução</button>
+            <button class="menu-btn" data-section="notificacoesSection">🔔 Notificações</button>
+        </aside>
+
+        <main class="dashboard-content">
+            <section class="dashboard-section" id="livrosSection">
+                <h2>Livros Disponíveis</h2>
+                <div id="livrosList">
+                    <p>Carregando livros...</p>
+                </div>
+            </section>
+
+            <section class="dashboard-section" id="doarSection" style="display:none;">
+                <h2>Doar um Livro</h2>
+                <form id="doarLivroForm">
+                    <label for="titulo">Título:</label>
+                    <input type="text" id="titulo" required>
+                    <label for="autor">Autor:</label>
+                    <input type="text" id="autor" required>
+                    <label for="isbn">ISBN:</label>
+                    <input type="text" id="isbn" required>
+                    <label for="anoPublicacao">Ano de Publicação:</label>
+                    <input type="number" id="anoPublicacao" required>
+                    <button type="submit">Doar Livro</button>
+                </form>
+                <div id="doacaoMessage" class="message"></div>
+            </section>
+
+            <section class="dashboard-section" id="emprestimosSection" style="display:none;">
+                <h2>Gerenciar Empréstimos</h2>
+                <h3>Emprestar Livro</h3>
+                <form id="emprestarLivroForm">
+                    <label for="emprestimoIsbn">ISBN do Livro:</label>
+                    <input type="text" id="emprestimoIsbn" required>
+                    <button type="submit">Emprestar</button>
+                </form>
+                <div id="emprestimoMessage" class="message"></div>
+            </section>
+
+            <section class="dashboard-section" id="devolucaoSection" style="display:none;">
+                <h2>Gerenciar Devoluções</h2>
+                <h3>Devolver Livro</h3>
+                <form id="devolverLivroForm">
+                    <label for="devolucaoIsbn">ISBN do Livro:</label>
+                    <input type="text" id="devolucaoIsbn" required>
+                    <button type="submit">Devolver</button>
+                </form>
+                <div id="devolucaoMessage" class="message"></div>
+            </section>
+
+            <section class="dashboard-section" id="notificacoesSection" style="display:none;"> <h2>Minhas Notificações</h2>
+                <div id="notificacoesList">
+                    <p>Carregando notificações...</p>
+                </div>
+            </section>
+
+            <section class="dashboard-section" id="perfilSection" style="display:none;">
+                <h2>Meu Perfil</h2>
+                <div class="perfil-info">
+                    <img src="https://img.icons8.com/ios-filled/80/8e44ad/user-male-circle.png" alt="Avatar" class="perfil-avatar">
+                    <div>
+                        <p><strong>Nome:</strong> <span id="perfilNome"></span></p>
+                        <p><strong>ID de Usuário:</strong> <span id="perfilId"></span></p>
+                        <p><strong>Saldo de Moedas:</strong> <span id="perfilSaldo"></span></p>
+                    </div>
+                </div>
+                <div class="perfil-actions">
+                    <button id="logoutButtonPerfil">Sair da Conta</button>
+                </div>
+            </section>
+
+           
+        </main>
+    </div>
+
+    <script src="/js/script.js"></script>
+   
+</body>
+</html>
