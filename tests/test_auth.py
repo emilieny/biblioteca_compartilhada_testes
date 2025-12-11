@@ -16,9 +16,7 @@ def client():
             db.drop_all()
 
 
-# ------------------------------
-# CADASTRO
-# ------------------------------
+# TESTES PARA CADASTRO
 
 def test_register_success(client):
     data = {
@@ -55,7 +53,7 @@ def test_register_invalid_email_format(client):
         "email": "email-invalido"
     })
 
-    # backend permite email qualquer
+    
     assert response.status_code == 201
 
 
@@ -71,9 +69,7 @@ def test_register_empty_fields(client):
     assert response.status_code == 400
 
 
-# ------------------------------
-# LOGIN
-# ------------------------------
+# TESTES PARA LOGIN
 
 def test_login_success(client):
     client.post("/api/register", json={
